@@ -1,23 +1,30 @@
 defmodule Exmonads do
-  def bind({:error, _} = error, _), do: error
-  def bind({:ok, value}, fun) do
-    fun.(value)
+  defmacro {:error, message} ~> _ do
+    {:error, message}
   end
-
-  def {:error, message} ~> _, do: {:error, message}
-  def {:ok, value} ~> fun do
-    fun.(value)
+  defmacro {:ok, input} ~> {method, meta, args} do
+    {method, meta, [input | args]}
+  end
+  defmacro left ~> right do
+    quote do
+      case unquote(left) do
+        {:error, message} -> {:error, message}
+        {:ok, value} -> {:ok, value} ~> unquote(right)
+      end
+    end
   end
 end
 
 defmodule Exmonads.Examples do
-  def divide_by(value) do
-    fn(y) ->
-      try do
-        {:ok, y / value}
-      rescue
-        _e in ArithmeticError -> {:error, "Divide by zero"}
-      end
+  def divide_by(input, divisor) do
+    try do
+      {:ok, input / divisor}
+    rescue
+      _e in ArithmeticError -> {:error, "Divide by zero"}
     end
+  end
+
+  def add_by(input, more) do
+    {:ok, input + more}
   end
 end
