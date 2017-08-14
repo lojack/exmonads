@@ -1,7 +1,5 @@
 defmodule Exmonads do
-  defmacro {:error, message} ~> _ do
-    {:error, message}
-  end
+  defmacro {:error, message} ~> _, do: {:error, message}
   defmacro {:ok, input} ~> {method, meta, args} do
     {method, meta, [input | args]}
   end
