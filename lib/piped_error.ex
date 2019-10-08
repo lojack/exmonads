@@ -1,4 +1,5 @@
-defmodule Exmonads do
+defmodule PipedError do
+
   defmacro {:error, message} ~> _, do: {:error, message}
 
   defmacro {:ok, input} ~> {method, meta, args} do
@@ -8,8 +9,10 @@ defmodule Exmonads do
   defmacro left ~> right do
     quote do
       case unquote(left) do
-        {:error, message} -> {:error, message}
-        {:ok, value} -> {:ok, value} ~> unquote(right)
+        {:ok, value} ->
+          {:ok, value} ~> unquote(right)
+        {:error, message} ->
+          {:error, message}
       end
     end
   end
